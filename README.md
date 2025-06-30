@@ -55,13 +55,13 @@ sequenceDiagram
         GameLoop->>BoardLogic: isWinner(currentPlayer)
         BoardLogic-->>GameLoop: Return true/false
 
-        alt If winner
+        alt Player wins
             GameLoop->>User: Announce winner
             break
-        else If draw
+        else Draw
             GameLoop->>User: Announce draw
             break
-        else
+        else Continue
             GameLoop->>GameLoop: Switch player
         end
     end
