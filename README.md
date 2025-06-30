@@ -13,3 +13,56 @@ Unit tests written with JUnit 5 cover initial board setup, win conditions, draw 
 Reviewers should confirm that the game runs correctly from the console, enforces rules, handles invalid input gracefully, declares outcomes properly, and offers replay.
 
 The code uses a single class (`TicTacToe.java`) focusing on MVP design with clear separation of concerns planned for future iterations.
+
+```mermaid
+classDiagram
+    class TicTacToe {
+        - String[] board
+        - Scanner scanner
+        + main(String[] args): void
+        + resetBoard(): void
+        + printBoard(): void
+        + playGame(): void
+        + getValidMove(): int
+        + isWinner(player: String): boolean
+        + askPlayAgain(): boolean
+        + getBoard(): String[]
+        + setBoard(newBoard: String[]): void
+    }
+```
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Main
+    participant GameLoop
+    participant Input
+    participant BoardLogic
+
+    User->>Main: Start program (main)
+    Main->>GameLoop: playGame()
+
+    loop Until game ends
+        GameLoop->>Input: getValidMove()
+        Input->>User: Prompt for move
+        User-->>Input: Enter move
+        Input->>Input: Validate move
+        Input->>GameLoop: Return valid move
+
+        GameLoop->>BoardLogic: Update board
+        GameLoop->>BoardLogic: isWinner(currentPlayer)
+        BoardLogic-->>GameLoop: Return true/false
+
+        alt If winner
+            GameLoop->>User: Announce winner
+            break
+        else If draw
+            GameLoop->>User: Announce draw
+            break
+        else
+            GameLoop->>GameLoop: Switch player
+        end
+    end
+
+    GameLoop->>User: Ask to play again
+```
