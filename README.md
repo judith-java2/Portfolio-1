@@ -17,17 +17,17 @@ The code uses a single class (`TicTacToe.java`) focusing on MVP design with clea
 ```mermaid
 classDiagram
     class TicTacToe {
-        - String[] board
-        - Scanner scanner
-        + main(String[] args): void
-        + resetBoard(): void
-        + printBoard(): void
-        + playGame(): void
-        + getValidMove(): int
-        + isWinner(player: String): boolean
-        + askPlayAgain(): boolean
-        + getBoard(): String[]
-        + setBoard(newBoard: String[]): void
+        - board : String array
+        - scanner : Scanner
+        + main(args : String array) : void
+        + resetBoard() : void
+        + printBoard() : void
+        + playGame() : void
+        + getValidMove() : int
+        + isWinner(player : String) : boolean
+        + askPlayAgain() : boolean
+        + getBoard() : String array
+        + setBoard(newBoard : String array) : void
     }
 ```
 
@@ -57,10 +57,8 @@ sequenceDiagram
 
         alt Player wins
             GameLoop->>User: Announce winner
-            break
         else Draw
             GameLoop->>User: Announce draw
-            break
         else Continue
             GameLoop->>GameLoop: Switch player
         end
