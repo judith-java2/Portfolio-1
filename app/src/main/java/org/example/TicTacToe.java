@@ -3,122 +3,142 @@ package org.example;
 import java.util.Scanner;
 
 public class TicTacToe {
-
-    private static final String[] board = new String[9];
     private static final Scanner scanner = new Scanner(System.in);
+    private static final GameLog gameLog = new GameLog();
 
-    public static void main(String[] args) {
-        System.out.println("Welcome to Tic-Tac-Toe!");
-        boolean playAgain;
-        do {
-            resetBoard();
-            playGame();
-            playAgain = askPlayAgain();
-        } while (playAgain);
-        System.out.println("Goodbye!");
-    }
+    private char[] board;
+    private char currentPlayer;
 
-    // Reset the board to default numbered state
-    public static void resetBoard() {
+    public TicTacToe(char firstPlayer) {
+        board = new char[9];
         for (int i = 0; i < 9; i++) {
-            board[i] = String.valueOf(i + 1);
+            board[i] = (char) ('1' + i);
         }
+        currentPlayer = firstPlayer;
     }
 
-    // Print the current board
-    public static void printBoard() {
-        System.out.println();
-        System.out.printf("  %s  |  %s  |  %s%n", board[0], board[1], board[2]);
-        System.out.println("-----+-----+-----");
-        System.out.printf("  %s  |  %s  |  %s%n", board[3], board[4], board[5]);
-        System.out.println("-----+-----+-----");
-        System.out.printf("  %s  |  %s  |  %s%n%n", board[6], board[7], board[8]);
-    }
-
-    // Run the main game loop
-    public static void playGame() {
-        String currentPlayer = "X";
-        int moves = 0;
+    public void play() {
         boolean gameEnded = false;
 
         while (!gameEnded) {
             printBoard();
-            int move = getValidMove();
+            int move = getUserMove();
             board[move - 1] = currentPlayer;
-            moves++;
 
-            if (isWinner(currentPlayer)) {
+            if (checkWin()) {
                 printBoard();
-                System.out.println("Player " + currentPlayer + " wins!");
+                System.out.println("Player " + currentPlayer + " wins! The current log is:");
+                gameLog.recordWin(String.valueOf(currentPlayer));
+                gameLog.printLog();
                 gameEnded = true;
-            } else if (moves == 9) {
+            } else if (isBoardFull()) {
                 printBoard();
-                System.out.println("It's a draw!");
+                System.out.println("It's a tie! The current log is:");
+                gameLog.recordWin("Tie");
+                gameLog.printLog();
                 gameEnded = true;
             } else {
-                currentPlayer = currentPlayer.equals("X") ? "O" : "X";
+                switchPlayer();
             }
         }
     }
 
-    // Prompt the player and return a valid move (1–9)
-    public static int getValidMove() {
+    private void printBoard() {
+        System.out.println();
+        System.out.println(" " + board[0] + " | " + board[1] + " | " + board[2]);
+        System.out.println("---+---+---");
+        System.out.println(" " + board[3] + " | " + board[4] + " | " + board[5]);
+        System.out.println("---+---+---");
+        System.out.println(" " + board[6] + " | " + board[7] + " | " + board[8]);
+        System.out.println();
+    }
+
+    private int getUserMove() {
+        int move;
         while (true) {
-            System.out.print("What is your move? ");
-            String input = scanner.nextLine().trim();
-
+            System.out.print("Player " + currentPlayer + ", enter your move (1-9): ");
+            String input = scanner.nextLine();
             try {
-                int move = Integer.parseInt(input);
+                move = Integer.parseInt(input);
                 if (move < 1 || move > 9) {
-                    System.out.println("That is not a valid move! Try again.");
-                } else if (!board[move - 1].equals(String.valueOf(move))) {
-                    System.out.println("That is not a valid move! Try again.");
-                } else {
-                    return move;
+                    System.out.println("Invalid move. Please enter a number from 1 to 9.");
+                    continue;
                 }
+                if (board[move - 1] == 'X' || board[move - 1] == 'O') {
+                    System.out.println("That spot is already taken. Try again.");
+                    continue;
+                }
+                break;
             } catch (NumberFormatException e) {
-                System.out.println("That is not a valid move! Try again.");
+                System.out.println("Invalid input. Please enter a number.");
             }
         }
+        return move;
     }
 
-    // Check if the given player has won
-    public static boolean isWinner(String player) {
-        int[][] winConditions = {
-            {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Rows
-            {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // Columns
-            {0, 4, 8}, {2, 4, 6}             // Diagonals
+    private boolean checkWin() {
+        int[][] wins = {
+            {0,1,2}, {3,4,5}, {6,7,8},
+            {0,3,6}, {1,4,7}, {2,5,8},
+            {0,4,8}, {2,4,6}
         };
-        for (int[] condition : winConditions) {
-            if (board[condition[0]].equals(player) &&
-                board[condition[1]].equals(player) &&
-                board[condition[2]].equals(player)) {
+        for (int[] win : wins) {
+            if (board[win[0]] == currentPlayer &&
+                board[win[1]] == currentPlayer &&
+                board[win[2]] == currentPlayer) {
                 return true;
             }
         }
         return false;
     }
 
-    // Ask the user if they want to play again
-    public static boolean askPlayAgain() {
-        while (true) {
+    private boolean isBoardFull() {
+        for (char c : board) {
+            if (c != 'X' && c != 'O') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void switchPlayer() {
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Welcome to Tic-Tac-Toe!");
+
+        char firstPlayer = 'X';
+        boolean playAgain = true;
+        String lastLoser = null;
+
+        while (playAgain) {
+            if (lastLoser != null && (lastLoser.equals("X") || lastLoser.equals("O"))) {
+                firstPlayer = lastLoser.charAt(0);
+                System.out.println("Great! This time " + firstPlayer + " will go first!");
+            } else {
+                firstPlayer = 'X';
+            }
+
+            TicTacToe game = new TicTacToe(firstPlayer);
+            game.play();
+            if (gameLog.getXWins() > gameLog.getOWins()) {
+                lastLoser = "O";
+            } else if (gameLog.getOWins() > gameLog.getXWins()) {
+                lastLoser = "X";
+            } else {
+                lastLoser = "X";
+            }
+
             System.out.print("Would you like to play again (yes/no)? ");
-            String input = scanner.nextLine().trim().toLowerCase();
-            if (input.equals("yes")) return true;
-            if (input.equals("no")) return false;
-            System.out.println("That is not a valid entry!");
+            String response = scanner.nextLine().trim().toLowerCase();
+            if (!response.equals("yes") && !response.equals("y")) {
+                playAgain = false;
+                System.out.println("Writing the game log to disk. Please see game.txt for the final statistics!");
+                gameLog.saveToDisk("game.txt");
+            }
         }
-    }
 
-    // Getter for test access
-    public static String[] getBoard() {
-        return board.clone();
-    }
-
-    // Setter for test access — testing use only
-    public static void setBoard(String[] newBoard) {
-        for (int i = 0; i < 9; i++) {
-            board[i] = newBoard[i];
-        }
+        scanner.close();
     }
 }
