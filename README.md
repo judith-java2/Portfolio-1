@@ -2,7 +2,7 @@
 
 This project implements a human versus human Tic-Tac-Toe game played in the console with a 3x3 grid numbered 1 to 9. Player 1 uses “X” and Player 2 uses “O”.
 
-To set up, clone the repository with git clone https://github.com/judith-java/tic-tac-toe.git then run ./gradlew build to compile and ./gradlew run to start the game.
+To set up, clone the repository with git clone https://github.com/judith-java/Portfolio-1.git then run ./gradlew build to compile and ./gradlew run to start the game.
 
 Players alternate turns entering the number corresponding to their move; the program validates input to reject invalid, occupied, or out-of-range entries without crashing.
 
