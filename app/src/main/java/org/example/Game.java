@@ -13,9 +13,6 @@ public class Game {
         this.resultChecker = new GameResultChecker();
     }
 
-    /**
-     * Plays a full game, returns the winner symbol ("X" or "O"), or "TIE" if no winner.
-     */
     public String play() {
         Player currentPlayer = playerX;
         board.reset();
